@@ -1,11 +1,11 @@
-package edu.marist.gildein;
+package edu.marist.costic;
 
 /**
  * App utility class for constants.
  */
 public final class CONSTANTS {
     /** Application name. */
-    private static String appName = "helloworld";
+    private static String appName = "grepyCO";
     /** Application version. */
     private static String version = "0.0.1";
 
