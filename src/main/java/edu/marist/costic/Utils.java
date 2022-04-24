@@ -1,5 +1,7 @@
 package edu.marist.costic;
 
+import java.io.File;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -11,6 +13,40 @@ import org.apache.commons.cli.ParseException;
  * General utilty and helper methods.
  */
 public class Utils {
+
+    // input and output files for the program
+    private File inputFile;
+    private File nfaDotFile;
+    private File dfaDotFile;
+
+    private String regex;
+    private List<String> inputStrings;
+    private String alphabet;
+
+    /**
+     * Getter for regex string
+     * @return the regex string
+     */
+    public String getRegex() {
+        return regex;
+    }
+
+    /**
+     * Getter for the list of input strings
+     * @return the list of input strings
+     */
+    public List<String> getInput() {
+        return inputStrings;
+    }
+
+    /**
+     * Getter for the file alphabet
+     * @return the alphabet of the input file
+     */
+    public String getAlphabet() {
+        return alphabet;
+    }
+
     /**
      * Print help text.
      *
@@ -33,6 +69,8 @@ public class Utils {
         Options options = new Options();
         options.addOption("v", false, "Verbose mode");
         options.addOption("h", false, "Display this help text");
+        options.addOption("n", true, "The dot file to write the NFA to");
+        options.addOption("d", true, "The dot file the write the DFA to");
         return options;
     }
 
@@ -57,12 +95,29 @@ public class Utils {
         if (cmd.hasOption("h")) {
             printHelpText(options);
             System.exit(0);
-        } else if (cmd.hasOption("v")) {
+        }
+        
+        if (cmd.hasOption("v")) {
             System.out.println("Verbose mode");
             System.out.println(CONSTANTS.getAppName()
                     + " version: "
                     + CONSTANTS.getVersion());
         }
+
+        nfaDotFile = new File(cmd.getOptionValue("n", CONSTANTS.getDefaultNFAFile()));
+        dfaDotFile = new File(cmd.getOptionValue("d", CONSTANTS.getDefaultDFAFile()));
+
+        String[] otherArgs = cmd.getArgs();
+
+        // make sure there is exactly 2 more arguments
+        if (otherArgs.length < 2) {
+            error("Missing arguments. Need one argument for regex and one for input file");
+        } else if (otherArgs.length > 2) {
+            error("Too many arguments. Need one argument for regex and one for input file");
+        }
+
+        regex = otherArgs[0];
+        inputFile = new File(otherArgs[1]);
 
         return cmd;
     }
