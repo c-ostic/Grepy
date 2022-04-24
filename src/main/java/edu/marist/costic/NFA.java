@@ -1,5 +1,6 @@
 package edu.marist.costic;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -15,7 +16,7 @@ class InvalidRegexException extends Exception
 
 public class NFA {
     // the delta function maps a state to the list of states it is connected to on a particular symbol
-    private Dictionary<StateSymbolPair, List<String>> deltaFunction;
+    private Dictionary<StateSymbolPair, List<Integer>> deltaFunction;
 
     private Set<Character> alphabet;
     private int states;
@@ -29,7 +30,7 @@ public class NFA {
         currentChar = 0;
         states = 0;
 
-        deltaFunction = new Hashtable<StateSymbolPair,List<String>>();
+        deltaFunction = new Hashtable<StateSymbolPair,List<Integer>>();
 
         try {
             parseRegex();
@@ -81,7 +82,17 @@ public class NFA {
     }
 
     private void addToDelta(StateSymbolPair pair, int result) {
+        // get the current list associated with this pair
+        List<Integer> currentList = deltaFunction.get(pair);
 
+        // if the list doesn't exist, then it is a new pair and it needs to be added
+        if (currentList == null) {
+            currentList = new ArrayList<Integer>();
+            deltaFunction.put(pair, currentList);
+        }
+
+        // add the result to the list
+        currentList.add(result);
     }
 
     public String convertToDot(){
