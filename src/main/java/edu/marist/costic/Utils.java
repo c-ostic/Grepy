@@ -1,7 +1,12 @@
 package edu.marist.costic;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -21,10 +26,15 @@ public class Utils {
 
     private String regex;
     private List<String> inputStrings;
-    private String alphabet;
+    private Set<Character> alphabet;
+
+    public Utils() {
+        inputStrings = new ArrayList<String>();
+        alphabet = new HashSet<Character>();
+    }
 
     /**
-     * Getter for regex string
+     * Getter for regex string.
      * @return the regex string
      */
     public String getRegex() {
@@ -32,7 +42,7 @@ public class Utils {
     }
 
     /**
-     * Getter for the list of input strings
+     * Getter for the list of input strings.
      * @return the list of input strings
      */
     public List<String> getInput() {
@@ -40,10 +50,10 @@ public class Utils {
     }
 
     /**
-     * Getter for the file alphabet
+     * Getter for the file alphabet.
      * @return the alphabet of the input file
      */
-    public String getAlphabet() {
+    public Set<Character> getAlphabet() {
         return alphabet;
     }
 
@@ -96,7 +106,7 @@ public class Utils {
             printHelpText(options);
             System.exit(0);
         }
-        
+
         if (cmd.hasOption("v")) {
             System.out.println("Verbose mode");
             System.out.println(CONSTANTS.getAppName()
@@ -119,7 +129,34 @@ public class Utils {
         regex = otherArgs[0];
         inputFile = new File(otherArgs[1]);
 
+        processInput();
+
         return cmd;
+    }
+
+    /**
+     * Process the input file to create the list of input strings and the alphabet.
+     */
+    private void processInput() {
+        try {
+            Scanner scan = new Scanner(inputFile);
+
+            while (scan.hasNextLine()) {
+                String nextLine = scan.nextLine();
+
+                // add the next line to the list of input
+                inputStrings.add(nextLine);
+
+                // add the characters of the line to the alphabet set
+                for (char c : nextLine.toCharArray()) {
+                    alphabet.add(c);
+                }
+            }
+            scan.close();
+
+        } catch (FileNotFoundException e) {
+            error(e.getMessage());
+        }
     }
 
     /**

@@ -8,9 +8,9 @@ public final class CONSTANTS {
     private static String appName = "grepyCO";
     /** Application version. */
     private static String version = "0.0.1";
-    /** Default NFA dot file name */
+    /** Default NFA dot file name. */
     private static String nfaDot = "nfa.dot";
-    /** Default DFA dot file name */
+    /** Default DFA dot file name. */
     private static String dfaDot = "dfa.dot";
 
     /**
@@ -37,7 +37,7 @@ public final class CONSTANTS {
     }
 
     /**
-     * Default NFA file name getter
+     * Default NFA file name getter.
      * @return Default NFA file name
      */
     public static String getDefaultNFAFile() {
@@ -45,7 +45,7 @@ public final class CONSTANTS {
     }
 
     /**
-     * Default DFA file name getter
+     * Default DFA file name getter.
      * @return Default DFA file name
      */
     public static String getDefaultDFAFile() {

@@ -18,7 +18,13 @@ public final class App {
 
         utils.processArgs(args);
 
-        System.out.println("Hello World CO!");
+        for (char c : utils.getAlphabet()) {
+            System.out.println(c);
+        }
+
+        for (String s : utils.getInput()) {
+            System.out.println(s);
+        }
 
         System.exit(returnCode);
     }
