@@ -4,7 +4,10 @@ package edu.marist.costic;
  * Represents a state and a symbol, for use in the delta functions of FSAs.
  */
 public class StateSymbolPair {
-    private final String state;
+
+    public final char EPSILON = ' ';
+
+    private final int state;
     private final char symbol;
 
     /**
@@ -12,16 +15,21 @@ public class StateSymbolPair {
      * @param state the FSA state.
      * @param symbol a symbol in the FSA's alphabet.
      */
-    public StateSymbolPair(String state, char symbol) {
+    public StateSymbolPair(int state, char symbol) {
         this.state = state;
         this.symbol = symbol;
+    }
+
+    public StateSymbolPair(int state) {
+        this.state = state;
+        this.symbol = EPSILON;
     }
 
     /**
      * Gets the state.
      * @return the state.
      */
-    public String getState() {
+    public int getState() {
         return state;
     }
 
@@ -39,7 +47,7 @@ public class StateSymbolPair {
      * @return true if the parts of each StateSymbolPair are equal.
      */
     public boolean equals(StateSymbolPair other) {
-        return state.equals(other.getState()) && symbol == other.getSymbol();
+        return state == other.getState() && symbol == other.getSymbol();
     }
 
     /**
@@ -48,7 +56,7 @@ public class StateSymbolPair {
      * @param otherSymbol the other symbol to compare to.
      * @return true if the state and symbol match those of this object.
      */
-    public boolean equals(String otherState, char otherSymbol) {
-        return state.equals(otherState) && symbol == otherSymbol;
+    public boolean equals(int otherState, char otherSymbol) {
+        return state == otherState && symbol == otherSymbol;
     }
 }

@@ -166,7 +166,7 @@ public class Utils {
      * @param msg        Error message to be printed
      * @param returnCode Return code to exit with
      */
-    public void error(final String msg, final int returnCode) {
+    public static void error(final String msg, final int returnCode) {
         System.err.println(msg);
         System.exit(returnCode);
     }
@@ -177,7 +177,7 @@ public class Utils {
      *
      * @param msg Error message to be printed
      */
-    public void error(final String msg) {
+    public static void error(final String msg) {
         System.err.println(msg);
         System.exit(-1);
     }
