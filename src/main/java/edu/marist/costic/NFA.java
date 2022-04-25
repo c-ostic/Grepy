@@ -46,7 +46,7 @@ public class NFA {
     private int[] parseUnionGroup() throws InvalidRegexException {
         int[] leftSide = parseConcatGroup();
 
-        if(currentChar < regex.length()) {
+        if(currentChar < regex.length() && regex.charAt(currentChar) != ')') {
             if(regex.charAt(currentChar) != '+') {
                 throw new InvalidRegexException("Invalid characters beyond regex");
             } else {
@@ -74,7 +74,18 @@ public class NFA {
     }
 
     private int[] parseConcatGroup() {
-        return null;
+        int[] leftSide = parseKleeneGroup();
+        if (currentChar < regex.length() && regex.charAt(currentChar) != ')' && regex.charAt(currentChar) != '+') {
+            // there is more to concat
+            int[] rightSide = parseConcatGroup();
+
+            // add the necessary relation to the delta function
+            addToDelta(new StateSymbolPair(leftSide[1]), rightSide[0]);
+
+            return new int[] {leftSide[0], rightSide[1]};
+        } else {
+            return leftSide;
+        }
     }
 
     private int[] parseKleeneGroup() {
