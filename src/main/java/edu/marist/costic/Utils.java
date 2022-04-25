@@ -1,7 +1,10 @@
 package edu.marist.costic;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -156,6 +159,34 @@ public class Utils {
 
         } catch (FileNotFoundException e) {
             error(e.getMessage());
+        }
+    }
+
+    /**
+     * Writes the dot formatted NFA to the file specified in the initial arguments.
+     * @param dotFormat
+     */
+    public void writeNFA(String dotFormat) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(nfaDotFile));
+            writer.write(dotFormat);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error writing NFA to file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Writes the dot formatted DFA to the file specified in the initial arguments.
+     * @param dotFormat
+     */
+    public void writeDFA(String dotFormat) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(dfaDotFile));
+            writer.write(dotFormat);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error writing NFA to file: " + e.getMessage());
         }
     }
 
