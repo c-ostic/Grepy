@@ -47,9 +47,7 @@ public class NFA {
         int[] leftSide = parseConcatGroup();
 
         if(currentChar < regex.length() && regex.charAt(currentChar) != ')') {
-            if(regex.charAt(currentChar) != '+') {
-                throw new InvalidRegexException("Invalid characters beyond regex");
-            } else {
+            if(regex.charAt(currentChar) == '+') {
                 // the next character is a '+' so move past it
                 currentChar++;
                 int[] rightSide = parseUnionGroup();
@@ -67,13 +65,15 @@ public class NFA {
                 addToDelta(new StateSymbolPair(rightSide[1]), unionEnd);
 
                 return new int[] {unionStart, unionEnd};
+            } else {
+                throw new InvalidRegexException("Invalid characters beyond regex");
             }
         } else {
             return leftSide;
         }
     }
 
-    private int[] parseConcatGroup() {
+    private int[] parseConcatGroup() throws InvalidRegexException {
         int[] leftSide = parseKleeneGroup();
         if (currentChar < regex.length() && regex.charAt(currentChar) != ')' && regex.charAt(currentChar) != '+') {
             // there is more to concat
@@ -88,7 +88,7 @@ public class NFA {
         }
     }
 
-    private int[] parseKleeneGroup() {
+    private int[] parseKleeneGroup() throws InvalidRegexException {
         int[] symbolGroup = parseSymbolGroup();
         if (currentChar < regex.length() && regex.charAt(currentChar) == '*') {
             // the next character is a '*' so move past it
@@ -101,8 +101,42 @@ public class NFA {
         return symbolGroup;
     }
 
-    private int[] parseSymbolGroup() {
-        return null;
+    private int[] parseSymbolGroup() throws InvalidRegexException {
+        if (currentChar < regex.length()) {
+            if (regex.charAt(currentChar) == '(') {
+                // the next character is a '(' so move past it
+                currentChar++;
+
+                // call the top level regex expression
+                int[] innerRegex = parseUnionGroup();
+
+                if (regex.charAt(currentChar) == ')') {
+                    currentChar++;
+                } else {
+                    throw new InvalidRegexException("Missing right parenthesis");
+                }
+
+                return innerRegex;
+            } else if (alphabet.contains(regex.charAt(currentChar))){
+                // get the next two available states for the start and end of this one symbol expression
+                int start = states;
+                states++;
+                int end = states;
+                states++;
+
+                // add the necessary relation to the delta function
+                addToDelta(new StateSymbolPair(start, regex.charAt(currentChar)), end);
+
+                // advance the character counter
+                currentChar++;
+
+                return new int[] {start, end};
+            } else {
+                throw new InvalidRegexException("Character not in recognized alphabet");
+            }
+        } else {
+            throw new InvalidRegexException("Tried to parse beyond regex for some reason");
+        }
     }
 
     private void addToDelta(StateSymbolPair pair, int result) {
