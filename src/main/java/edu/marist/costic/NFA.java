@@ -6,14 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class InvalidRegexException extends Exception
-{
-    public InvalidRegexException(String message)
-    {
-        super(message);
-    }
-}
-
 /**
  * Represents an NFA.
  */
@@ -38,7 +30,7 @@ public class NFA {
         currentChar = 0;
         states = 0;
 
-        deltaFunction = new HashMap<StateSymbolPair,List<Integer>>();
+        deltaFunction = new HashMap<StateSymbolPair, List<Integer>>();
 
         try {
             parseRegex();
@@ -63,8 +55,8 @@ public class NFA {
     private int[] parseUnionGroup() throws InvalidRegexException {
         int[] leftSide = parseConcatGroup();
 
-        if(currentChar < regex.length() && regex.charAt(currentChar) != ')') {
-            if(regex.charAt(currentChar) == '+') {
+        if (currentChar < regex.length() && regex.charAt(currentChar) != ')') {
+            if (regex.charAt(currentChar) == '+') {
                 // the next character is a '+' so move past it
                 currentChar++;
                 int[] rightSide = parseUnionGroup();
@@ -134,40 +126,36 @@ public class NFA {
      * @throws InvalidRegexException
      */
     private int[] parseSymbolGroup() throws InvalidRegexException {
-        if (currentChar < regex.length()) {
-            if (regex.charAt(currentChar) == '(') {
-                // the next character is a '(' so move past it
+        if (regex.charAt(currentChar) == '(') {
+            // the next character is a '(' so move past it
+            currentChar++;
+
+            // call the top level regex expression
+            int[] innerRegex = parseUnionGroup();
+
+            if (regex.charAt(currentChar) == ')') {
                 currentChar++;
-
-                // call the top level regex expression
-                int[] innerRegex = parseUnionGroup();
-
-                if (regex.charAt(currentChar) == ')') {
-                    currentChar++;
-                } else {
-                    throw new InvalidRegexException("Missing right parenthesis");
-                }
-
-                return innerRegex;
-            } else if (alphabet.contains(regex.charAt(currentChar))){
-                // get the next two available states for the start and end of this one symbol expression
-                int start = states;
-                states++;
-                int end = states;
-                states++;
-
-                // add the necessary relation to the delta function
-                addToDelta(new StateSymbolPair(start, regex.charAt(currentChar)), end);
-
-                // advance the character counter
-                currentChar++;
-
-                return new int[] {start, end};
             } else {
-                throw new InvalidRegexException("Character not in recognized alphabet");
+                throw new InvalidRegexException("Missing right parenthesis");
             }
+
+            return innerRegex;
+        } else if (alphabet.contains(regex.charAt(currentChar))) {
+            // get the next two available states for the start and end of this one symbol expression
+            int start = states;
+            states++;
+            int end = states;
+            states++;
+
+            // add the necessary relation to the delta function
+            addToDelta(new StateSymbolPair(start, regex.charAt(currentChar)), end);
+
+            // advance the character counter
+            currentChar++;
+
+            return new int[] {start, end};
         } else {
-            throw new InvalidRegexException("Tried to parse beyond regex for some reason");
+            throw new InvalidRegexException("Character not in recognized alphabet");
         }
     }
 

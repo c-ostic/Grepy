@@ -26,6 +26,12 @@ public final class App {
             System.out.println(s);
         }
 
+        System.out.println("Creating NFA...");
+        NFA nfa = new NFA(utils.getRegex(), utils.getAlphabet());
+        System.out.println("Converting to DOT format...");
+        utils.writeNFA(nfa.convertToDot());
+        System.out.println("DONE");
+
         System.exit(returnCode);
     }
 }

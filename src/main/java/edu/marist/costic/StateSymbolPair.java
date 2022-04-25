@@ -5,7 +5,10 @@ package edu.marist.costic;
  */
 public class StateSymbolPair {
 
-    public final char EPSILON = ' ';
+    /**
+     * constant character to represent epsilon (empty).
+     */
+    public static final char EPSILON = ' ';
 
     private final int state;
     private final char symbol;
@@ -20,6 +23,10 @@ public class StateSymbolPair {
         this.symbol = symbol;
     }
 
+    /**
+     * Constructs a StateSymbalPair object defaulting the symbol to epsilon.
+     * @param state the FSA state.
+     */
     public StateSymbolPair(int state) {
         this.state = state;
         this.symbol = EPSILON;
@@ -42,6 +49,17 @@ public class StateSymbolPair {
     }
 
     /**
+     * Overrides the equals method in object.
+     */
+    public boolean equals(Object o) {
+        if (o instanceof StateSymbolPair) {
+            return this.equals((StateSymbolPair) o);
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Compares two StateSymbolPairs based upon state and symbol.
      * @param other the other StateSymbolPair.
      * @return true if the parts of each StateSymbolPair are equal.
@@ -58,5 +76,14 @@ public class StateSymbolPair {
      */
     public boolean equals(int otherState, char otherSymbol) {
         return state == otherState && symbol == otherSymbol;
+    }
+
+    /**
+     * Overrides the hashCode method in object.
+     */
+    public int hashCode() {
+        int hash = 17;
+        hash = hash * state * symbol;
+        return hash;
     }
 }
