@@ -89,6 +89,19 @@ public class NFA {
     }
 
     private int[] parseKleeneGroup() {
+        int[] symbolGroup = parseSymbolGroup();
+        if (currentChar < regex.length() && regex.charAt(currentChar) == '*') {
+            // the next character is a '*' so move past it
+            currentChar++;
+
+            // add the necessary relations to the delta function (epsilons between the existing start and end states)
+            addToDelta(new StateSymbolPair(symbolGroup[0]), symbolGroup[1]);
+            addToDelta(new StateSymbolPair(symbolGroup[1]), symbolGroup[0]);
+        }
+        return symbolGroup;
+    }
+
+    private int[] parseSymbolGroup() {
         return null;
     }
 
