@@ -55,7 +55,7 @@ public class DFA {
 
 
         // the first set added is everything available from the start of the NFA and is given the state of 0
-        Set<Integer> startingSet = epsilonClosure(nfa, nfa.getStartState());
+        Set<Integer> startingSet = nfa.epsilonClosure(nfa.getStartState());
         unprocessedSubsets.add(startingSet);
         subsetToDFAState.put(startingSet, 0);
 
@@ -88,7 +88,7 @@ public class DFA {
 
                 // get the next states from all the states in the current set
                 for (int state : currentSet) {
-                    nextSubset.addAll(epsilonClosure(nfa, nfa.getConnectedStates(state, c)));
+                    nextSubset.addAll(nfa.getConnectedStates(state, c));
                 }
 
                 // get the next available state to give to the next subset
@@ -101,25 +101,5 @@ public class DFA {
                 unprocessedSubsets.add(nextSubset);
             }
         }
-    }
-
-    /**
-     * Creates a set of all states that can be reached through epsilon transitions from each state in stateSet.
-     * @param nfa
-     * @param stateSet
-     * @return A set of states
-     */
-    private Set<Integer> epsilonClosure(NFA nfa, Set<Integer> stateSet) {
-        return null;
-    }
-
-    /**
-     * Creates a set of all states that can be reached through epsilon transitions from the given state.
-     * @param nfa
-     * @param state
-     * @return A set of states
-     */
-    private Set<Integer> epsilonClosure(NFA nfa, int state) {
-        return null;
     }
 }

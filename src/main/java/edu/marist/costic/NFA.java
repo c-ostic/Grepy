@@ -2,7 +2,9 @@ package edu.marist.costic;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -15,8 +17,10 @@ public class NFA {
     private Set<Character> alphabet;
     private int states;
     private int startState;
-    private int endState; // NOTE: NFAs are allowed to have multiple end states, 
-                          // but will only have one if constructed with Thompson's algorithm
+
+    // NOTE: NFAs are allowed to have multiple end states,
+    // but will only have one if constructed with Thompson's algorithm
+    private int endState;
 
     private String regex;
     private int currentChar;
@@ -59,21 +63,65 @@ public class NFA {
 
     /**
      * Gets the list of connected states given by a StateSymbolPair according to the deltaFunction.
+     * This includes through any amount of epsilon transitions.
      * @param pair
      * @return the list of states
      */
-    public Set<Integer> GetConnectedStates(StateSymbolPair pair) {
-        return deltaFunction.get(pair);
+    public Set<Integer> getConnectedStates(StateSymbolPair pair) {
+        Set<Integer> connectedStates = deltaFunction.get(pair);
+        connectedStates.addAll(epsilonClosure(connectedStates));
+        return connectedStates;
     }
 
     /**
      * Gets the list of connected states given by a state and a symbol according to the deltaFunction.
+     * This includes through any amount of epsilon transitions.
      * @param state
      * @param symbol
      * @return the list of states
      */
-    public Set<Integer> GetConnectedStates(int state, char symbol) {
-        return GetConnectedStates(new StateSymbolPair(state, symbol));
+    public Set<Integer> getConnectedStates(int state, char symbol) {
+        return getConnectedStates(new StateSymbolPair(state, symbol));
+    }
+
+    /**
+     * Creates a set of all states that can be reached through epsilon transitions from each state in stateSet.
+     * @param stateSet
+     * @return A set of states
+     */
+    public Set<Integer> epsilonClosure(Set<Integer> stateSet) {
+        Set<Integer> epsilonSet = new HashSet<Integer>();
+        for (int i : stateSet) {
+            epsilonSet.addAll(epsilonClosure(i));
+        }
+        return epsilonSet;
+    }
+
+    /**
+     * Creates a set of all states that can be reached through epsilon transitions from the given state.
+     * @param state
+     * @return A set of states
+     */
+    public Set<Integer> epsilonClosure(int state) {
+        Queue<Integer> unprocessedStates = new LinkedList<Integer>();
+        Set<Integer> visitedStates = new HashSet<Integer>();
+
+        // add all of the initial epsilon transition from the starting state
+        unprocessedStates.addAll(deltaFunction.get(new StateSymbolPair(state)));
+
+        // process each in the queue, adding them to the visited list
+        while (!unprocessedStates.isEmpty()) {
+            int currentState = unprocessedStates.remove();
+            visitedStates.add(currentState);
+
+            for (int nextState : deltaFunction.get(new StateSymbolPair(currentState))) {
+                if (!visitedStates.contains(nextState)) {
+                    unprocessedStates.add(nextState);
+                }
+            }
+        }
+
+        return visitedStates;
     }
 
     /**
