@@ -15,6 +15,8 @@ public class NFA {
 
     private Set<Character> alphabet;
     private int states;
+    private int startState;
+    private int endState;
 
     private String regex;
     private int currentChar;
@@ -44,7 +46,9 @@ public class NFA {
      * @throws InvalidRegexException
      */
     private void parseRegex() throws InvalidRegexException {
-        parseUnionGroup();
+        int[] startEndstates = parseUnionGroup();
+        startState = startEndstates[0];
+        endState = startEndstates[1];
     }
 
     /**
@@ -126,6 +130,9 @@ public class NFA {
      * @throws InvalidRegexException
      */
     private int[] parseSymbolGroup() throws InvalidRegexException {
+        if (currentChar >= regex.length()) {
+            throw new InvalidRegexException("Reached end of regex expecting more characters");
+        }
         if (regex.charAt(currentChar) == '(') {
             // the next character is a '(' so move past it
             currentChar++;
@@ -185,10 +192,22 @@ public class NFA {
     public String convertToDot() {
         String dotFormat = "digraph nfa {\n";
 
+        // add the double circle to the end state
+        dotFormat += "\t" + endState + " [shape=doublecircle];\n";
+
+        // add the start state with a fake empty state to simulate the first arrow
+        dotFormat += "\tstart [label=\"\",shape=none];\n";
+        dotFormat += "\tstart -> " + startState + ";\n\n";
+
+        // add each of the node pairs to the string
         for (StateSymbolPair pair : deltaFunction.keySet()) {
             List<Integer> destinations = deltaFunction.get(pair);
             for (int dest : destinations) {
-                dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=" + pair.getSymbol() + "];\n";
+                if (pair.getSymbol() == StateSymbolPair.EPSILON) {
+                    dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=epsilon];\n";
+                } else {
+                    dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=" + pair.getSymbol() + "];\n";
+                }
             }
         }
 
