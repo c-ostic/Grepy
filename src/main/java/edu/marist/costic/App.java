@@ -18,7 +18,11 @@ public final class App {
 
         utils.processArgs(args);
 
-        System.out.println("Hello World CO!");
+        System.out.println("Creating NFA...");
+        NFA nfa = new NFA(utils.getRegex(), utils.getAlphabet());
+        System.out.println("Converting NFA to DOT format...");
+        utils.writeNFA(nfa.convertToDot());
+        System.out.println("DONE");
 
         System.exit(returnCode);
     }

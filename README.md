@@ -1,14 +1,17 @@
-# helloworld
-Simple hello world application template
+# GrepyCO
+Grep-like program to detect strings with regex by converting it to NFAs and DFAs.
+Currently, only generates an NFA dot file.
 
 ## Usage
 ```
-~/helloworld$ java -jar target/helloworld-0.0.1-SNAPSHOT-jar-with-dependencies.jar -h
-helloworld
-Version: 0.0.1
-usage: helloworld
+java -jar target/grepyCO-0.0.2-SNAPSHOT-jar-with-dependencies.jar -h
+grepyCO
+Version: 0.0.2
+usage: grepyCO
  -h   Display this help text
  -v   Verbose mode
+ -n   Specify NFA dot file
+ -d   Specify DFA dot file
 ```
 
 ## Using the Template
