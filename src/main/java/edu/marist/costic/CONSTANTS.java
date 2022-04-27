@@ -7,7 +7,7 @@ public final class CONSTANTS {
     /** Application name. */
     private static String appName = "grepyCO";
     /** Application version. */
-    private static String version = "0.0.1";
+    private static String version = "0.0.2";
     /** Default NFA dot file name. */
     private static String nfaDot = "nfa.dot";
     /** Default DFA dot file name. */

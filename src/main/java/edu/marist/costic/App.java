@@ -18,17 +18,9 @@ public final class App {
 
         utils.processArgs(args);
 
-        for (char c : utils.getAlphabet()) {
-            System.out.println(c);
-        }
-
-        for (String s : utils.getInput()) {
-            System.out.println(s);
-        }
-
         System.out.println("Creating NFA...");
         NFA nfa = new NFA(utils.getRegex(), utils.getAlphabet());
-        System.out.println("Converting to DOT format...");
+        System.out.println("Converting NFA to DOT format...");
         utils.writeNFA(nfa.convertToDot());
         System.out.println("DONE");
 
