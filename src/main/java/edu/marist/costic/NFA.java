@@ -1,8 +1,7 @@
 package edu.marist.costic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,8 +9,8 @@ import java.util.Set;
  * Represents an NFA.
  */
 public class NFA {
-    // the delta function maps a state to the list of states it is connected to on a particular symbol
-    private Map<StateSymbolPair, List<Integer>> deltaFunction;
+    // the delta function maps a state to the set of states it is connected to on a particular symbol
+    private Map<StateSymbolPair, Set<Integer>> deltaFunction;
 
     private Set<Character> alphabet;
     private int states;
@@ -33,7 +32,7 @@ public class NFA {
         currentChar = 0;
         states = 0;
 
-        deltaFunction = new HashMap<StateSymbolPair, List<Integer>>();
+        deltaFunction = new HashMap<StateSymbolPair, Set<Integer>>();
 
         try {
             parseRegex();
@@ -63,7 +62,7 @@ public class NFA {
      * @param pair
      * @return the list of states
      */
-    public List<Integer> GetConnectedStates(StateSymbolPair pair) {
+    public Set<Integer> GetConnectedStates(StateSymbolPair pair) {
         return deltaFunction.get(pair);
     }
 
@@ -73,7 +72,7 @@ public class NFA {
      * @param symbol
      * @return the list of states
      */
-    public List<Integer> GetConnectedStates(int state, char symbol) {
+    public Set<Integer> GetConnectedStates(int state, char symbol) {
         return GetConnectedStates(new StateSymbolPair(state, symbol));
     }
 
@@ -209,11 +208,11 @@ public class NFA {
      */
     private void addToDelta(StateSymbolPair pair, int result) {
         // get the current list associated with this pair
-        List<Integer> currentList = deltaFunction.get(pair);
+        Set<Integer> currentList = deltaFunction.get(pair);
 
         // if the list doesn't exist, then it is a new pair and it needs to be added
         if (currentList == null) {
-            currentList = new ArrayList<Integer>();
+            currentList = new HashSet<Integer>();
             deltaFunction.put(pair, currentList);
         }
 
@@ -237,7 +236,7 @@ public class NFA {
 
         // add each of the node pairs to the string
         for (StateSymbolPair pair : deltaFunction.keySet()) {
-            List<Integer> destinations = deltaFunction.get(pair);
+            Set<Integer> destinations = deltaFunction.get(pair);
             for (int dest : destinations) {
                 if (pair.getSymbol() == StateSymbolPair.EPSILON) {
                     dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=epsilon];\n";
