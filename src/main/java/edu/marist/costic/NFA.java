@@ -68,6 +68,16 @@ public class NFA {
     }
 
     /**
+     * Gets the list of connected states given by a state and a symbol according to the deltaFunction.
+     * @param state
+     * @param symbol
+     * @return the list of states
+     */
+    public List<Integer> GetConnectedStates(int state, char symbol) {
+        return GetConnectedStates(new StateSymbolPair(state, symbol));
+    }
+
+    /**
      * Starts the recursive descent through parsing the regex.
      * @throws InvalidRegexException
      */
