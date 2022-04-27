@@ -16,7 +16,8 @@ public class NFA {
     private Set<Character> alphabet;
     private int states;
     private int startState;
-    private int endState;
+    private int endState; // NOTE: NFAs are allowed to have multiple end states, 
+                          // but will only have one if constructed with Thompson's algorithm
 
     private String regex;
     private int currentChar;
@@ -39,6 +40,31 @@ public class NFA {
         } catch (InvalidRegexException e) {
             Utils.error("Error parsing regex: " + e.getMessage());
         }
+    }
+
+    /**
+     * Gets the start state of the NFA.
+     * @return the start state.
+     */
+    public int getStartState() {
+        return startState;
+    }
+
+    /**
+     * Gets the end state of the NFA.
+     * @return the end state.
+     */
+    public int getEndState() {
+        return endState;
+    }
+
+    /**
+     * Gets the list of connected states given by a StateSymbolPair according to the deltaFunction.
+     * @param pair
+     * @return the list of states
+     */
+    public List<Integer> GetConnectedStates(StateSymbolPair pair) {
+        return deltaFunction.get(pair);
     }
 
     /**
