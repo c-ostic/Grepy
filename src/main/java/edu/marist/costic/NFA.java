@@ -107,7 +107,7 @@ public class NFA {
         Set<Integer> visitedStates = new HashSet<Integer>();
 
         // add all of the initial epsilon transition from the starting state
-        unprocessedStates.addAll(deltaFunction.get(new StateSymbolPair(state)));
+        unprocessedStates.addAll(deltaFunction.getOrDefault(new StateSymbolPair(state), Set.of()));
 
         // process each in the queue, adding them to the visited list
         while (!unprocessedStates.isEmpty()) {

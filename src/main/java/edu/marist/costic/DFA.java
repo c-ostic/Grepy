@@ -35,6 +35,7 @@ public class DFA {
 
         deltaFunction = new HashMap<StateSymbolPair, Integer>();
         endStates = new HashSet<Integer>();
+        subsetLabels = new HashMap<Integer, String>();
 
         subsetConstruction(nfa);
     }
@@ -66,6 +67,8 @@ public class DFA {
             // if the set is in the processedSets then skip it
             if (processedSubsets.contains(currentSet)) {
                 continue;
+            } else {
+                processedSubsets.add(currentSet);
             }
 
 
@@ -79,7 +82,6 @@ public class DFA {
 
             // set the string representation for this state
             subsetLabels.put(currentState, currentSet.toString());
-
 
             // for each symbol in the alphabet, get the next set of possible states with that symbol
             // and add them to the delta function
@@ -101,5 +103,41 @@ public class DFA {
                 unprocessedSubsets.add(nextSubset);
             }
         }
+    }
+
+    /**
+     * Converts the DFA to dot format.
+     * @return the dot format as a string.
+     */
+    public String convertToDot() {
+        String dotFormat = "digraph nfa {\n";
+
+        // add the double circle to the end states
+        for (int endState : endStates) {
+            dotFormat += "\t" + endState + " [shape=doublecircle];\n";
+        }
+
+        // add the start state with a fake empty state to simulate the first arrow
+        dotFormat += "\tstart [label=\"\",shape=none];\n";
+        dotFormat += "\tstart -> " + 0 + ";\n\n";
+
+        // add subset labels for each of the nodes
+        for (int state : subsetLabels.keySet()) {
+            dotFormat += "\t" + state + " [label=\"" + subsetLabels.get(state) + "\"];\n";
+        }
+
+        // add each of the node pairs to the string
+        for (StateSymbolPair pair : deltaFunction.keySet()) {
+            int dest = deltaFunction.get(pair);
+            if (pair.getSymbol() == StateSymbolPair.EPSILON) {
+                dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=epsilon];\n";
+            } else {
+                dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=" + pair.getSymbol() + "];\n";
+            }
+        }
+
+        dotFormat += "}";
+
+        return dotFormat;
     }
 }

@@ -22,6 +22,12 @@ public final class App {
         NFA nfa = new NFA(utils.getRegex(), utils.getAlphabet());
         System.out.println("Converting NFA to DOT format...");
         utils.writeNFA(nfa.convertToDot());
+
+        System.out.println("Creating DFA...");
+        DFA dfa = new DFA(nfa, utils.getAlphabet());
+        System.out.println("Converting DFA to DOT format...");
+        utils.writeDFA(dfa.convertToDot());
+
         System.out.println("DONE");
 
         System.exit(returnCode);
