@@ -65,11 +65,14 @@ public class NFA {
      * Gets the list of connected states given by a StateSymbolPair according to the deltaFunction.
      * This includes through any amount of epsilon transitions.
      * @param pair
-     * @return the list of states
+     * @return the list of states. If no states exist for pair, return an empty set
      */
     public Set<Integer> getConnectedStates(StateSymbolPair pair) {
-        Set<Integer> connectedStates = deltaFunction.get(pair);
-        connectedStates.addAll(epsilonClosure(connectedStates));
+        Set<Integer> connectedStates = deltaFunction.getOrDefault(pair, Set.of());
+        Set<Integer> connectedEpsilons = epsilonClosure(connectedStates);
+        for (int epsilonState : connectedEpsilons) {
+            connectedStates.add(epsilonState);
+        }
         return connectedStates;
     }
 
@@ -78,7 +81,7 @@ public class NFA {
      * This includes through any amount of epsilon transitions.
      * @param state
      * @param symbol
-     * @return the list of states
+     * @return the list of states. If no states exist for pair, return an empty set
      */
     public Set<Integer> getConnectedStates(int state, char symbol) {
         return getConnectedStates(new StateSymbolPair(state, symbol));
@@ -87,12 +90,14 @@ public class NFA {
     /**
      * Creates a set of all states that can be reached through epsilon transitions from each state in stateSet.
      * @param stateSet
-     * @return A set of states
+     * @return A set of states. If stateSet is null, return an empty set
      */
     public Set<Integer> epsilonClosure(Set<Integer> stateSet) {
         Set<Integer> epsilonSet = new HashSet<Integer>();
-        for (int i : stateSet) {
-            epsilonSet.addAll(epsilonClosure(i));
+        if (stateSet != null) {
+            for (int i : stateSet) {
+                epsilonSet.addAll(epsilonClosure(i));
+            }
         }
         return epsilonSet;
     }
@@ -100,7 +105,7 @@ public class NFA {
     /**
      * Creates a set of all states that can be reached through epsilon transitions from the given state.
      * @param state
-     * @return A set of states
+     * @return A set of states. If there are no epsilon transitions from state, return an empty set
      */
     public Set<Integer> epsilonClosure(int state) {
         Queue<Integer> unprocessedStates = new LinkedList<Integer>();
@@ -114,7 +119,7 @@ public class NFA {
             int currentState = unprocessedStates.remove();
             visitedStates.add(currentState);
 
-            for (int nextState : deltaFunction.get(new StateSymbolPair(currentState))) {
+            for (int nextState : deltaFunction.getOrDefault(new StateSymbolPair(currentState), Set.of())) {
                 if (!visitedStates.contains(nextState)) {
                     unprocessedStates.add(nextState);
                 }

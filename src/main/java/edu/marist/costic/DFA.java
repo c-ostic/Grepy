@@ -56,9 +56,12 @@ public class DFA {
 
 
         // the first set added is everything available from the start of the NFA and is given the state of 0
-        Set<Integer> startingSet = nfa.epsilonClosure(nfa.getStartState());
+        Set<Integer> startingSet = new HashSet<Integer>();
+        startingSet.add(nfa.getStartState());
+        startingSet.addAll(nfa.epsilonClosure(nfa.getStartState()));
         unprocessedSubsets.add(startingSet);
         subsetToDFAState.put(startingSet, 0);
+        states++;
 
 
         while (!unprocessedSubsets.isEmpty()) {
@@ -93,24 +96,29 @@ public class DFA {
                     nextSubset.addAll(nfa.getConnectedStates(state, c));
                 }
 
-                // get the next available state to give to the next subset
-                int nextState = states;
-                states++;
-                subsetToDFAState.put(nextSubset, nextState);
+                // if the nextSubset is not empty, continue processing
+                if (!nextSubset.isEmpty()) {
+                    int nextState = subsetToDFAState.getOrDefault(nextSubset, -1);
+                    if (nextState == -1) {
+                        nextState = states;
+                        states++;
+                        subsetToDFAState.put(nextSubset, nextState);
+                    }
 
-                deltaFunction.put(new StateSymbolPair(currentState, c), nextState);
+                    deltaFunction.put(new StateSymbolPair(currentState, c), nextState);
 
-                unprocessedSubsets.add(nextSubset);
-            }
-        }
-    }
+                    unprocessedSubsets.add(nextSubset);
+                } // end if
+            } // end for
+        } // end while
+    } // end method
 
     /**
      * Converts the DFA to dot format.
      * @return the dot format as a string.
      */
     public String convertToDot() {
-        String dotFormat = "digraph nfa {\n";
+        String dotFormat = "digraph dfa {\n";
 
         // add the double circle to the end states
         for (int endState : endStates) {

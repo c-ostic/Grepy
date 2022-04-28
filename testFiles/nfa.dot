@@ -1,7 +1,31 @@
 digraph nfa {
+	19 [shape=doublecircle];
+	start [label="",shape=none];
+	start -> 18;
+
 	0 -> 1 [label=a];
-	3 -> 4 [label= ];
-	1 -> 2 [label= ];
+	0 -> 3 [label=epsilon];
+	12 -> 13 [label=epsilon];
+	16 -> 6 [label=epsilon];
+	16 -> 10 [label=epsilon];
+	18 -> 0 [label=epsilon];
+	18 -> 16 [label=epsilon];
 	2 -> 3 [label=b];
-	4 -> 5 [label=c];
+	4 -> 5 [label=a];
+	6 -> 7 [label=b];
+	10 -> 11 [label=b];
+	8 -> 9 [label=c];
+	12 -> 13 [label=b];
+	3 -> 0 [label=epsilon];
+	3 -> 4 [label=epsilon];
+	1 -> 2 [label=epsilon];
+	7 -> 8 [label=epsilon];
+	13 -> 12 [label=epsilon];
+	13 -> 14 [label=epsilon];
+	11 -> 12 [label=epsilon];
+	9 -> 17 [label=epsilon];
+	15 -> 17 [label=epsilon];
+	5 -> 19 [label=epsilon];
+	17 -> 19 [label=epsilon];
+	14 -> 15 [label=a];
 }
