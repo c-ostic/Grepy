@@ -28,7 +28,16 @@ public final class App {
         System.out.println("Converting DFA to DOT format...");
         utils.writeDFA(dfa.convertToDot());
 
-        System.out.println("DONE");
+        System.out.println("Processing Input...");
+        System.out.println();
+
+        System.out.println("Accepted Strings:");
+
+        for (String s : utils.getInput()) {
+            if (dfa.accepts(s)) {
+                System.out.println(s);
+            }
+        }
 
         System.exit(returnCode);
     }

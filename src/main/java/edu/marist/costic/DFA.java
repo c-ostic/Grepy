@@ -148,4 +148,20 @@ public class DFA {
 
         return dotFormat;
     }
+
+    /**
+     * Simulates the DFA and determines if a string s is accepted or rejected.
+     * @param s the string to test
+     * @return true if the string is accepted, false otherwise
+     */
+    public boolean accepts(String s) {
+        int currentState = 0;
+        for (int i = 0; i < s.length(); i++) {
+            currentState = deltaFunction.getOrDefault(new StateSymbolPair(currentState, s.charAt(i)), -1);
+            if (currentState == -1) {
+                return false;
+            }
+        }
+        return endStates.contains(currentState);
+    }
 }
