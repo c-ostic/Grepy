@@ -205,9 +205,18 @@ public class NFA {
             // the next character is a '*' so move past it
             currentChar++;
 
-            // add the necessary relations to the delta function (epsilons between the existing start and end states)
-            addToDelta(new StateSymbolPair(symbolGroup[0]), symbolGroup[1]);
+            // get the next 2 available state counts and make them the beginning and the end of the kleene group
+            int kleeneStart = states;
+            states++;
+            int kleeneEnd = states;
+            states++;
+
+            // add the necessary relations to the delta function
+            addToDelta(new StateSymbolPair(kleeneStart), symbolGroup[0]);
+            addToDelta(new StateSymbolPair(symbolGroup[1]), kleeneEnd);
+            addToDelta(new StateSymbolPair(kleeneStart), kleeneEnd);
             addToDelta(new StateSymbolPair(symbolGroup[1]), symbolGroup[0]);
+            return new int[] {kleeneStart, kleeneEnd};
         }
         return symbolGroup;
     }
