@@ -30,6 +30,7 @@ public class Utils {
     private String regex;
     private List<String> inputStrings;
     private Set<Character> alphabet;
+    private boolean verbose;
 
     public Utils() {
         inputStrings = new ArrayList<String>();
@@ -115,6 +116,7 @@ public class Utils {
             System.out.println(CONSTANTS.getAppName()
                     + " version: "
                     + CONSTANTS.getVersion());
+            verbose = true;
         }
 
         nfaDotFile = new File(cmd.getOptionValue("n", CONSTANTS.getDefaultNFAFile()));
@@ -187,6 +189,16 @@ public class Utils {
             writer.close();
         } catch (IOException e) {
             System.out.println("Error writing NFA to file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Logging helper that only prints if the verbose option was specified.
+     * @param msg the log message to be printed
+     */
+    public void log(final String msg) {
+        if (verbose) {
+            System.out.println(msg);
         }
     }
 
