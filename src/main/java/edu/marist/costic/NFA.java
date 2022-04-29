@@ -1,21 +1,25 @@
 package edu.marist.costic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
  * Represents an NFA.
  */
 public class NFA {
-    // the delta function maps a state to the list of states it is connected to on a particular symbol
-    private Map<StateSymbolPair, List<Integer>> deltaFunction;
+    // the delta function maps a state to the set of states it is connected to on a particular symbol
+    private Map<StateSymbolPair, Set<Integer>> deltaFunction;
 
     private Set<Character> alphabet;
     private int states;
     private int startState;
+
+    // NOTE: NFAs are allowed to have multiple end states,
+    // but will only have one if constructed with Thompson's algorithm
     private int endState;
 
     private String regex;
@@ -32,13 +36,97 @@ public class NFA {
         currentChar = 0;
         states = 0;
 
-        deltaFunction = new HashMap<StateSymbolPair, List<Integer>>();
+        deltaFunction = new HashMap<StateSymbolPair, Set<Integer>>();
 
         try {
             parseRegex();
         } catch (InvalidRegexException e) {
             Utils.error("Error parsing regex: " + e.getMessage());
         }
+    }
+
+    /**
+     * Gets the start state of the NFA.
+     * @return the start state.
+     */
+    public int getStartState() {
+        return startState;
+    }
+
+    /**
+     * Gets the end state of the NFA.
+     * @return the end state.
+     */
+    public int getEndState() {
+        return endState;
+    }
+
+    /**
+     * Gets the list of connected states given by a StateSymbolPair according to the deltaFunction.
+     * This includes through any amount of epsilon transitions.
+     * @param pair
+     * @return the list of states. If no states exist for pair, return an empty set
+     */
+    public Set<Integer> getConnectedStates(StateSymbolPair pair) {
+        Set<Integer> connectedStates = deltaFunction.getOrDefault(pair, Set.of());
+        Set<Integer> connectedEpsilons = epsilonClosure(connectedStates);
+        for (int epsilonState : connectedEpsilons) {
+            connectedStates.add(epsilonState);
+        }
+        return connectedStates;
+    }
+
+    /**
+     * Gets the list of connected states given by a state and a symbol according to the deltaFunction.
+     * This includes through any amount of epsilon transitions.
+     * @param state
+     * @param symbol
+     * @return the list of states. If no states exist for pair, return an empty set
+     */
+    public Set<Integer> getConnectedStates(int state, char symbol) {
+        return getConnectedStates(new StateSymbolPair(state, symbol));
+    }
+
+    /**
+     * Creates a set of all states that can be reached through epsilon transitions from each state in stateSet.
+     * @param stateSet
+     * @return A set of states. If stateSet is null, return an empty set
+     */
+    public Set<Integer> epsilonClosure(Set<Integer> stateSet) {
+        Set<Integer> epsilonSet = new HashSet<Integer>();
+        if (stateSet != null) {
+            for (int i : stateSet) {
+                epsilonSet.addAll(epsilonClosure(i));
+            }
+        }
+        return epsilonSet;
+    }
+
+    /**
+     * Creates a set of all states that can be reached through epsilon transitions from the given state.
+     * @param state
+     * @return A set of states. If there are no epsilon transitions from state, return an empty set
+     */
+    public Set<Integer> epsilonClosure(int state) {
+        Queue<Integer> unprocessedStates = new LinkedList<Integer>();
+        Set<Integer> visitedStates = new HashSet<Integer>();
+
+        // add all of the initial epsilon transition from the starting state
+        unprocessedStates.addAll(deltaFunction.getOrDefault(new StateSymbolPair(state), Set.of()));
+
+        // process each in the queue, adding them to the visited list
+        while (!unprocessedStates.isEmpty()) {
+            int currentState = unprocessedStates.remove();
+            visitedStates.add(currentState);
+
+            for (int nextState : deltaFunction.getOrDefault(new StateSymbolPair(currentState), Set.of())) {
+                if (!visitedStates.contains(nextState)) {
+                    unprocessedStates.add(nextState);
+                }
+            }
+        }
+
+        return visitedStates;
     }
 
     /**
@@ -117,9 +205,18 @@ public class NFA {
             // the next character is a '*' so move past it
             currentChar++;
 
-            // add the necessary relations to the delta function (epsilons between the existing start and end states)
-            addToDelta(new StateSymbolPair(symbolGroup[0]), symbolGroup[1]);
+            // get the next 2 available state counts and make them the beginning and the end of the kleene group
+            int kleeneStart = states;
+            states++;
+            int kleeneEnd = states;
+            states++;
+
+            // add the necessary relations to the delta function
+            addToDelta(new StateSymbolPair(kleeneStart), symbolGroup[0]);
+            addToDelta(new StateSymbolPair(symbolGroup[1]), kleeneEnd);
+            addToDelta(new StateSymbolPair(kleeneStart), kleeneEnd);
             addToDelta(new StateSymbolPair(symbolGroup[1]), symbolGroup[0]);
+            return new int[] {kleeneStart, kleeneEnd};
         }
         return symbolGroup;
     }
@@ -173,11 +270,11 @@ public class NFA {
      */
     private void addToDelta(StateSymbolPair pair, int result) {
         // get the current list associated with this pair
-        List<Integer> currentList = deltaFunction.get(pair);
+        Set<Integer> currentList = deltaFunction.get(pair);
 
         // if the list doesn't exist, then it is a new pair and it needs to be added
         if (currentList == null) {
-            currentList = new ArrayList<Integer>();
+            currentList = new HashSet<Integer>();
             deltaFunction.put(pair, currentList);
         }
 
@@ -201,7 +298,7 @@ public class NFA {
 
         // add each of the node pairs to the string
         for (StateSymbolPair pair : deltaFunction.keySet()) {
-            List<Integer> destinations = deltaFunction.get(pair);
+            Set<Integer> destinations = deltaFunction.get(pair);
             for (int dest : destinations) {
                 if (pair.getSymbol() == StateSymbolPair.EPSILON) {
                     dotFormat += "\t" + pair.getState() + " -> " + dest + " [label=epsilon];\n";

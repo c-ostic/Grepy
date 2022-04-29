@@ -18,11 +18,26 @@ public final class App {
 
         utils.processArgs(args);
 
-        System.out.println("Creating NFA...");
+        utils.log("Creating NFA...");
         NFA nfa = new NFA(utils.getRegex(), utils.getAlphabet());
-        System.out.println("Converting NFA to DOT format...");
+        utils.log("Converting NFA to DOT format...");
         utils.writeNFA(nfa.convertToDot());
-        System.out.println("DONE");
+
+        utils.log("Creating DFA...");
+        DFA dfa = new DFA(nfa, utils.getAlphabet());
+        utils.log("Converting DFA to DOT format...");
+        utils.writeDFA(dfa.convertToDot());
+
+        utils.log("Processing Input...");
+        utils.log("");
+
+        utils.log("Accepted Strings:");
+
+        for (String s : utils.getInput()) {
+            if (dfa.accepts(s)) {
+                System.out.println(s);
+            }
+        }
 
         System.exit(returnCode);
     }

@@ -3,3 +3,7 @@ aba
 aaab
 cac
 abbc
+bbbca
+aaaaa
+accaaccb
+bababa
